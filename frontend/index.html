@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoinVision API Workspace</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="logo-icon">I</div>
+                <div class="brand-text">
+                    <h1>CoinVision API</h1>
+                    <p>Coin Classification Hub</p>
+                </div>
+            </div>
+            <nav class="nav-menu">
+                <a href="javascript:void(0);" class="nav-item active" data-view="home"><i class="fa-solid fa-house"></i> Home</a>
+                <a href="javascript:void(0);" class="nav-item" data-view="predict"><i class="fa-solid fa-wand-magic-sparkles"></i> Predict</a>
+                <a href="javascript:void(0);" class="nav-item" data-view="gradcam"><i class="fa-solid fa-image"></i> Predict + Grad-CAM</a>
+                <a href="javascript:void(0);" class="nav-item" data-view="docs"><i class="fa-solid fa-file-lines"></i> Docs Notebook</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <section id="home-view" class="view-section active">
+                <header class="section-header">
+                    <h2>Welcome to CoinVision Workspace</h2>
+                    <p>An intelligent deep learning environment for fine-grained coin asset classification.</p>
+                </header>
+
+                <div class="card info-box" style="background-color: #f1f5f9; border-color: #cbd5e1; color: #334155; margin-bottom: 32px;">
+                    <div class="info-icon" style="color: #64748b;"><i class="fa-solid fa-circle-info"></i></div>
+                    <div class="info-text">
+                        <h5 style="color: #1e293b;">Workspace Architecture</h5>
+                        <p style="color: #475569;">This platform integrates standard predictive pipelines alongside Gradient-weighted Class Activation Maps (Grad-CAM) to categorize currencies with high confidence and absolute model explainability.</p>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 32px;">
+                    <div class="card" style="margin-bottom: 0;">
+                        <h4 style="margin-bottom: 8px; color: var(--text-primary); display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-bolt" style="color: #eab308;"></i> Standalone Inference</h4>
+                        <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">Evaluates raw target images using optimized matrix transformations to produce top class arrays with minimized delivery lag signatures.</p>
+                    </div>
+                    <div class="card" style="margin-bottom: 0;">
+                        <h4 style="margin-bottom: 8px; color: var(--text-primary); display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-eye" style="color: var(--accent-blue);"></i> Localization Heatmaps</h4>
+                        <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">Maps weight importance back into convolutional streams to output fine-grained visual overlays indicating spatial activation metrics.</p>
+                    </div>
+                </div>
+
+                <div class="card" id="ledgerContainer">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <h3>Historical Audit Ledger</h3>
+                        <button id="clearLedgerBtn" style="background: #ef4444; color: #fff; padding: 4px 8px; border: none; border-radius: 4px; cursor: pointer; font-size: 0.75rem;">Clear Logs</button>
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left;" id="ledgerTable">
+                            <thead>
+                                <tr style="border-bottom: 2px solid var(--border-color); color: var(--text-secondary);">
+                                    <th style="padding: 8px;">Timestamp</th>
+                                    <th style="padding: 8px;">Target Source</th>
+                                    <th style="padding: 8px;">Prediction</th>
+                                    <th style="padding: 8px;">Confidence</th>
+                                    <th style="padding: 8px;">Pipeline Type</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ledgerBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="predict-view" class="view-section hidden">
+                <header class="section-header">
+                    <h2><span class="method-post" style="color: #22c55e;">POST</span> /predictions/predict</h2>
+                    <p>Perform direct multi-class inference on raw coin targets without activation maps.</p>
+                </header>
+
+                <div class="card upload-card">
+                    <h3>Upload or Drag Target Source</h3>
+                    <div class="drop-zone" id="predictDropZone" style="border: 2px dashed #cbd5e1; border-radius: 8px; padding: 32px; text-align: center; transition: all 0.2s ease;">
+                        <label for="predictFileInput" class="btn-choose" style="background-color: #f0fdf4; color: #22c55e; cursor: pointer;">Choose file</label>
+                        <input type="file" id="predictFileInput" accept="image/jpeg,image/png,image/jpg" hidden>
+                        <span class="file-name" id="predictFileNameDisplay" style="margin-left: 12px;">or drop raw asset context here</span>
+                        <i class="fa-solid fa-circle-check status-icon success hidden" id="predictStatusCheck"></i>
+                    </div>
+                </div>
+
+                <div class="loading-state hidden" id="predictLoadingState" style="color: #22c55e;">
+                    <i class="fa-solid fa-circle-notch fa-spin"></i> Running categorical assessment model...
+                </div>
+
+                <div class="results-container hidden" id="predictResultsContainer">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+                        <div>
+                            <div class="card result-card">
+                                <h3>Top Prediction Result</h3>
+                                <div class="result-body">
+                                    <div class="coin-badge">I</div>
+                                    <div class="result-details">
+                                        <div class="headline-row">
+                                            <h4 id="predictPredictedClass">Coin Target Class</h4>
+                                            <span class="confidence-tag" id="predictConfidenceVal">0.00%</span>
+                                        </div>
+                                        <p>Predicted Class ID: <span id="predictClassIdVal">N/A</span></p>
+                                        <p>Inference Time: <span id="predictInferenceTimeVal">0.0 ms</span></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <h3>Class Confidence Distribution</h3>
+                                <div id="predictTopPredictionsList" style="display: flex; flex-direction: column; gap: 16px; margin-top: 12px;"></div>
+                            </div>
+                        </div>
+                        <div class="card" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                            <h3>Target Source Inspection</h3>
+                            <div class="img-frame" style="width: 100%; max-width: 320px; margin-top: 12px;">
+                                <img id="predictOrigImg" src="" alt="Target Source View">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="gradcam-view" class="view-section hidden">
+                <header class="section-header">
+                    <h2><span class="method-post">POST</span> /predictions/analyze</h2>
+                    <p>Upload a coin image to extract activation heatmaps and classification boundaries.</p>
+                </header>
+
+                <div class="card upload-card">
+                    <h3>Upload or Drag Target Source</h3>
+                    <div class="drop-zone" id="gradcamDropZone" style="border: 2px dashed #cbd5e1; border-radius: 8px; padding: 32px; text-align: center; transition: all 0.2s ease;">
+                        <label for="fileInput" class="btn-choose" style="cursor: pointer;">Choose file</label>
+                        <input type="file" id="fileInput" accept="image/jpeg,image/png,image/jpg" hidden>
+                        <span class="file-name" id="fileNameDisplay" style="margin-left: 12px;">or drop raw asset context here</span>
+                        <i class="fa-solid fa-circle-check status-icon success hidden" id="statusCheck"></i>
+                    </div>
+                </div>
+
+                <div class="loading-state hidden" id="loadingState">
+                    <i class="fa-solid fa-circle-notch fa-spin"></i> Processing activation gradients...
+                </div>
+
+                <div class="results-container hidden" id="resultsContainer">
+                    <div class="card result-card">
+                        <h3>Prediction Result</h3>
+                        <div class="result-body">
+                            <div class="coin-badge">I</div>
+                            <div class="result-details">
+                                <div class="headline-row">
+                                    <h4 id="predictedClass">Coin Target Class</h4>
+                                    <span class="confidence-tag" id="confidenceVal">0.00%</span>
+                                </div>
+                                <p>Predicted Class ID: <span id="classIdVal">N/A</span></p>
+                                <p>Inference Time: <span id="inferenceTimeVal">0.0 ms</span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card viz-card">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <h3>Grad-CAM Visualization Layer</h3>
+                            <div style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem;">
+                                <label for="opacitySlider">Overlay Alpha blending:</label>
+                                <input type="range" id="opacitySlider" min="0" max="1" step="0.05" value="0.5" style="cursor: pointer;">
+                                <span id="opacityDisplay">0.50</span>
+                            </div>
+                        </div>
+                        <div class="viz-grid">
+                            <div class="viz-item">
+                                <p class="viz-label">Original Asset Image</p>
+                                <div class="img-frame"><img id="origImg" src="" alt="Original"></div>
+                            </div>
+                            <div class="viz-item">
+                                <p class="viz-label">Grad-CAM Spatial Heatmap</p>
+                                <div class="img-frame"><img id="heatmapImg" src="" alt="Heatmap"></div>
+                            </div>
+                            <div class="viz-item">
+                                <p class="viz-label">Blended Focus Overlay</p>
+                                <div class="img-frame" style="position: relative;">
+                                    <canvas id="blendCanvas" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;"></canvas>
+                                </div>
+                            </div>
+                            <div class="scale-bar-container">
+                                <span class="scale-text">High Focus</span>
+                                <div class="gradient-bar"></div>
+                                <span class="scale-text">Low Focus</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="docs-view" class="view-section hidden">
+                <header class="section-header">
+                    <h2>Knowledge Docs Notebook</h2>
+                    <p>Conceptual knowledge repository mapping out deep learning parameters and structural explanations.</p>
+                </header>
+
+                <div style="margin-bottom: 20px;">
+                    <input type="text" id="docsSearchInput" placeholder="Search parameters or glossary concepts..." style="width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 0.9rem; outline: none;">
+                </div>
+
+                <div id="docsNotebookContainer">
+                    <div class="card doc-item" data-terms="convolutional cnn residual connections resnet vanishing gradient">
+                        <h4 style="color: var(--accent-blue); margin-bottom: 8px; font-size: 1.05rem;">1. CNN Architectures & Residual Pipelines</h4>
+                        <p style="font-size: 0.88rem; line-height: 1.6; color: var(--text-primary);">
+                            As neural networks deepen, backward error matrices tend to contract down to zero, stalling model updates. ResNet architectures introduce residual connections that perform shortcut operations ($F(x) + x$), enabling deep gradient extraction.
+                        </p>
+                    </div>
+
+                    <div class="card doc-item" data-terms="transfer learning weights imagenet fine tuning fc layers">
+                        <h4 style="color: var(--accent-blue); margin-bottom: 8px; font-size: 1.05rem;">2. Empirical Transfer Learning paradigms</h4>
+                        <p style="font-size: 0.88rem; line-height: 1.6; color: var(--text-primary);">
+                            Instead of training millions of parameters from scratch, weights are mapped from networks pre-trained on ImageNet. Early filters extract edge boundaries and patterns, while customized linear heads handle local application classification.
+                        </p>
+                    </div>
+
+                    <div class="card doc-item" data-terms="cross entropy metrics validation accuracy score loss criteria">
+                        <h4 style="color: var(--accent-blue); margin-bottom: 8px; font-size: 1.05rem;">3. Model Evaluation Criteria</h4>
+                        <p style="font-size: 0.88rem; line-height: 1.6; color: var(--text-primary);">
+                            Loss tracks divergence via Cross-Entropy equations against targeted fields. Evaluation is verified against standalone validation datasets using accuracy metrics and standard confidence scores.
+                        </p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

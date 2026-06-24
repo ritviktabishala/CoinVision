@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual Environment
+.venv/
+venv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Database
+*.db
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+dist/
+build/
+
+# Local IDE
+.vscode/
+.idea/
+
+# Dataset only
+datasets/
+
+# Zip files
+*.zip
+
+# Local Uploads & Cached Images
+uploads/
+images/
+media/
